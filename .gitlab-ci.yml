@@ -1,0 +1,15 @@
+stages:
+- docker
+
+trigger:docker:backend:
+  tags:
+  - Curl
+  stage: docker
+  when: on_success
+  only:
+  - /^rel-.+_FEATURE$/
+  except:
+  - tags
+  - triggers
+  script:
+  - curl http://docker.vm.devel.cape-it.de/cgi-bin/update_image_kix18-backend
