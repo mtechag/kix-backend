@@ -12,4 +12,4 @@ trigger:docker:backend:
   - tags
   - triggers
   script:
-  - curl http://docker.vm.devel.cape-it.de/cgi-bin/update_image_kix18-backend
+  - curl -x http://proxy.intra.cape-it.de:3128 http://docker.vm.devel.cape-it.de/cgi-bin/update_image_kix18-backend
