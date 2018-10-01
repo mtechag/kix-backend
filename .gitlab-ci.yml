@@ -1,5 +1,19 @@
 stages:
+- buildnumber
 - docker
+
+trigger:buildnumber:backend:
+  tags:
+  - Shell
+  stage: buildnumber
+  when: on_success
+  only:
+  - /^rel-.+_FEATURE$/
+  except:
+  - tags
+  - triggers
+  script:
+  - echo $CI_PROJECT_DIR
 
 trigger:docker:backend:
   tags:
