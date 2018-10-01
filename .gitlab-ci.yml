@@ -23,7 +23,7 @@ trigger:buildnumber:backend:
   - git add RELEASE
   - git commit -a -m "[skip ci] increased build number"
   - git tag build-$BUILDNUMBER
-  - URL=http://$GITLAB_USER_LOGIN:_Ts7VRzvsKRbhguJjByv@git.intra.cape-it.de/$CI_PROJECT_PATH
+  - URL=http://gitlab-ci:_Ts7VRzvsKRbhguJjByv@git.intra.cape-it.de/$CI_PROJECT_PATH
   - URL=$(echo $URL | sed -e 's/\.git//')
   - echo $URL
   - git push $URL build-$BUILDNUMBER
