@@ -13,15 +13,17 @@ trigger:buildnumber:backend:
   - tags
   - triggers
   script:
-  - BUILDNUMBER=$(cat RELEASE | grep BUILDNUMBER | cut -d' ' -f3 | cut -d'-' -f1)
-  - BUILDNUMBER=$((BUILDNUMBER+1))
-  - sed -i -e "s/^BUILDNUMBER = .*$/BUILDNUMBER = $BUILDNUMBER/g" RELEASE
   - git config --global user.name "Gitlab Runner"
   - git config --global user.email gitlab-runner@git.intra.cape-it.de
   - git config --global push.default simple
+  - git checkout $CI_COMMIT_REF_NAME
+  - BUILDNUMBER=$(cat RELEASE | grep BUILDNUMBER | cut -d' ' -f3 | cut -d'-' -f1)
+  - BUILDNUMBER=$((BUILDNUMBER+1))
+  - sed -i -e "s/^BUILDNUMBER = .*$/BUILDNUMBER = $BUILDNUMBER/g" RELEASE
   - git add RELEASE
   - git commit -a -m "[skip ci] increased build number"
-  - git push
+  - git tag build-$BUILDNUMBER
+  - git push -u origin build-$BUILDNUMBER
 
 trigger:docker:backend:
   tags:
