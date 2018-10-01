@@ -24,8 +24,6 @@ trigger:buildnumber:backend:
   - git commit -a -m "[skip ci] increased build number"
   - git tag build-$BUILDNUMBER
   - echo $CI_PROJECT_URL
-  - # _Ts7VRzvsKRbhguJjByv
-  - #git push -u origin build-$BUILDNUMBER
 
 trigger:docker:backend:
   tags:
