@@ -13,6 +13,7 @@ trigger:buildnumber:backend:
   - tags
   - triggers
   script:
+  - set -x
   - BUILDNUMBER=$(cat RELEASE | grep BUILDNUMBER | cut -d' ' -f3 | cut -d'-' -f1)
   - BUILDNUMBER=$((BUILDNUMBER+1))
   - sed -i -e "s/^BUILDNUMBER = .*$/BUILDNUMBER = $BUILDNUMBER/g" RELEASE
