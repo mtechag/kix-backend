@@ -13,7 +13,10 @@ trigger:buildnumber:backend:
   - tags
   - triggers
   script:
-  - echo $CI_PROJECT_DIR
+  - BUILDNUMBER=$(cat RELEASE | grep BUILDNUMBER | cut -d' ' -f3 | cut -d'-' -f1)
+  - BUILDNUMBER=$((BUILDNUMBER+1))
+  - sed -i -e "s/^BUILDNUMBER = .*$/BUILDNUMBER = $BUILDNUMBER/g" RELEASE
+  - cat RELEASE
 
 trigger:docker:backend:
   tags:
