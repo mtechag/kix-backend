@@ -23,7 +23,10 @@ trigger:buildnumber:backend:
   - git add RELEASE
   - git commit -a -m "[skip ci] increased build number"
   - git tag build-$BUILDNUMBER
-  - git push http://$CI_USER_LOGIN:_Ts7VRzvsKRbhguJjByv@git.intra.cape-it.de/$CI_PROJECT_NAMESPACE/$CI_PROJECT_NAME build-$BUILDNUMBER
+  - URL=http://$CI_USER_LOGIN:_Ts7VRzvsKRbhguJjByv@git.intra.cape-it.de/$CI_PROJECT_PATH
+  - URL=$(echo $URL | sed -e 's/\.git//')
+  - echo $URL
+  - git push $URL build-$BUILDNUMBER
 
 trigger:docker:backend:
   tags:
