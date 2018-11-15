@@ -1,0 +1,46 @@
+variables:
+  GIT_STRATEGY: clone
+  
+stages:
+- buildinfo
+- docker
+
+trigger:buildinfo:backend:
+  tags:
+  - Shell
+  stage: buildinfo
+  when: on_success
+  only:
+  - /^rel-.+_FEATURE$/
+  except:
+  - tags
+  - triggers
+  script:
+  - git config --global user.name "$GITLAB_USER_NAME"
+  - git config --global user.email GITLAB_USER_EMAIL
+  - git config --global push.default simple
+  - git checkout $CI_COMMIT_REF_NAME
+  - BUILDNUMBER=$(cat RELEASE | grep BUILDNUMBER | cut -d' ' -f3 | cut -d'-' -f1)
+  - BUILDNUMBER=$((BUILDNUMBER+1))
+  - BUILDDATE=$(date --rfc-2822)
+  - BUILDHOST=$(hostname -f)
+  - sed -i -e "s/^BUILDNUMBER = .*$/BUILDNUMBER = $BUILDNUMBER/g" RELEASE
+  - sed -i -e "s/^BUILDDATE = .*$/BUILDDATE = $BUILDDATE/g" RELEASE
+  - sed -i -e "s/^BUILDHOST = .*$/BUILDHOST = $BUILDHOST/g" RELEASE
+  - git add RELEASE
+  - git commit -a -m "[skip ci] increased build number"
+  - git tag build-$BUILDNUMBER
+  - git push http://gitlab-ci:_Ts7VRzvsKRbhguJjByv@git.intra.cape-it.de/$CI_PROJECT_PATH
+
+trigger:docker:backend:
+  tags:
+  - Curl
+  stage: docker
+  when: on_success
+  only:
+  - /^rel-.+_FEATURE$/
+  except:
+  - tags
+  - triggers
+  script:
+  - curl -x http://proxy.intra.cape-it.de:3128 http://docker.vm.devel.cape-it.de/cgi-bin/update_image_kix18-backend
