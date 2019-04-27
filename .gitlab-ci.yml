@@ -62,7 +62,7 @@ build:
     - schedules
     - triggers 
   script:   
-    - tar cvfz kix-backend.tar.gz .
+    - tar cvfz kix-backend.tar.gz * --exclude=kix-backend.tar.gz
   artifacts:
     paths:
       - kix-backend.tar.gz
