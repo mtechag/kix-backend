@@ -2,13 +2,30 @@ variables:
   GIT_STRATEGY: clone
   
 stages:
-- buildinfo
+- triggerbuild
+- buildnumber
 - docker
 
-trigger:buildinfo:backend:
+triggerbuild:
+  tags:
+    - Shell
+  stage: triggerbuild
+  when: on_success
+  except:
+    - tags
+    - triggers
+  script:
+    - git config --global user.name "$GITLAB_USER_NAME"
+    - git config --global user.email GITLAB_USER_EMAIL
+    - git config --global push.default simple
+    - git checkout $CI_COMMIT_REF_NAME
+    - git tag build-$CI_COMMIT_SHORT_SHA
+    - git push --tags http://gitlab-ci:_Ts7VRzvsKRbhguJjByv@git.intra.cape-it.de/$CI_PROJECT_PATH
+
+buildnumber:
   tags:
   - Shell
-  stage: buildinfo
+  stage: buildnumber
   when: on_success
   only:
   - /^rel-.+_FEATURE$/
@@ -32,7 +49,26 @@ trigger:buildinfo:backend:
   - git tag build-$BUILDNUMBER
   - git push http://gitlab-ci:_Ts7VRzvsKRbhguJjByv@git.intra.cape-it.de/$CI_PROJECT_PATH
 
-trigger:docker:backend:
+build:
+  image: node:8
+  tags:
+    - Node
+  stage: build
+  only:
+    - tags
+    - /^build-.+$/ 
+  except:
+    - schedules
+    - triggers 
+  script:   
+    - tar cvfz kix-backend.tar.gz .
+  artifacts:
+    paths:
+      - kix-backend.tar.gz
+    expire_in: 1 week
+  allow_failure: false
+
+docker:
   tags:
   - Curl
   stage: docker
