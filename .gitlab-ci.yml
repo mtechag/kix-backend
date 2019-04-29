@@ -51,9 +51,8 @@ buildnumber:
   - git push http://gitlab-ci:_Ts7VRzvsKRbhguJjByv@git.intra.cape-it.de/$CI_PROJECT_PATH
 
 build:
-  image: node:8
   tags:
-    - Node
+    - Shell
   stage: build
   only:
     - tags
@@ -63,6 +62,7 @@ build:
     - triggers 
   script:   
     - tar cvfz kix-backend.tar.gz * --exclude=kix-backend.tar.gz
+    - curl -T kix-backend.tar.gz "http://artifactory.kix18.docker.vm.devel.cape-it.de/artifactory/kix18/$CI_COMMIT_SHORT_SHA/kix-backend.tar.gz"  
   artifacts:
     paths:
       - kix-backend.tar.gz
