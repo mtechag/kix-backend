@@ -62,7 +62,7 @@ build:
     - triggers 
   script:   
     - tar cvfz kix-backend.tar.gz * --exclude=kix-backend.tar.gz
-    - curl -u gitlab-ci:Ait4ugh2 -T kix-backend.tar.gz "http://artifactory.kix18.docker.vm.devel.cape-it.de/artifactory/kix18/backend/$CI_COMMIT_SHORT_SHA/kix-backend.tar.gz"  
+    - curl -u gitlab-ci:Ait4ugh2 -T kix-backend.tar.gz "http://artifactory.kix18.docker.vm.devel.cape-it.de/artifactory/kix18/backend/$CI_COMMIT_SHORT_SHA/kix-backend.tar.gz?gitlab-project=$CI_PROJECT_URL;gitlab-job=$CI_PROJECT_URL/-/jobs/$CI_JOB_ID"  
   artifacts:
     paths:
       - kix-backend.tar.gz
