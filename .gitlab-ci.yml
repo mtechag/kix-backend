@@ -27,7 +27,7 @@ triggerbuild:
       else 
         git tag -f build-$CI_COMMIT_SHORT_SHA
       fi  
-    - git push --tags http://gitlab-ci:_Ts7VRzvsKRbhguJjByv@git.intra.cape-it.de/$CI_PROJECT_PATH
+    - git push -f --tags http://gitlab-ci:_Ts7VRzvsKRbhguJjByv@git.intra.cape-it.de/$CI_PROJECT_PATH
 
 buildnumber:
   tags:
