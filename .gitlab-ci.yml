@@ -23,9 +23,9 @@ triggerbuild:
     - TARGET_BRANCH=$(echo $CI_COMMIT_REF_NAME | cut -d_ -f1)
     - |
       if [ "$TARGET_BRANCH" == "rel-18" ] || [ "$TARGET_BRANCH" == "master" ]; then
-        git tag build-$CI_COMMIT_REF_NAME
+        git tag -f build-$CI_COMMIT_REF_NAME
       else 
-        git tag build-$CI_COMMIT_SHORT_SHA
+        git tag -f build-$CI_COMMIT_SHORT_SHA
       fi  
     - git push --tags http://gitlab-ci:_Ts7VRzvsKRbhguJjByv@git.intra.cape-it.de/$CI_PROJECT_PATH
 
