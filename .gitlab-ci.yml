@@ -16,18 +16,16 @@ triggerbuild:
     - tags
     - triggers
   script:
-    - git config --global user.name "$GITLAB_USER_NAME"
-    - git config --global user.email GITLAB_USER_EMAIL
-    - git config --global push.default simple
-    - git checkout $CI_COMMIT_REF_NAME
     - TARGET_BRANCH=$(echo $CI_COMMIT_REF_NAME | cut -d_ -f1)
     - |
       if [ "$TARGET_BRANCH" == "rel-18" ] || [ "$TARGET_BRANCH" == "master" ]; then
+        git config --global user.name "$GITLAB_USER_NAME"
+        git config --global user.email GITLAB_USER_EMAIL
+        git config --global push.default simple
+        git checkout $CI_COMMIT_REF_NAME
         git tag -f build-$CI_COMMIT_REF_NAME
-      else 
-        git tag -f build-$CI_COMMIT_SHORT_SHA
+        git push -f --tags http://gitlab-ci:_Ts7VRzvsKRbhguJjByv@git.intra.cape-it.de/$CI_PROJECT_PATH
       fi  
-    - git push -f --tags http://gitlab-ci:_Ts7VRzvsKRbhguJjByv@git.intra.cape-it.de/$CI_PROJECT_PATH
 
 buildnumber:
   tags:
