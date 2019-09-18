@@ -2,13 +2,35 @@ variables:
   GIT_STRATEGY: clone
   
 stages:
-- buildinfo
+- triggerbuild
+- buildnumber
+- build
 - docker
 
-trigger:buildinfo:backend:
+triggerbuild:
+  tags:
+    - Shell
+  stage: triggerbuild
+  when: on_success
+  except:
+    - tags
+    - triggers
+  script:
+    - TARGET_BRANCH=$(echo $CI_COMMIT_REF_NAME | cut -d_ -f1)
+    - |
+      if [ "$TARGET_BRANCH" == "rel-18" ] || [ "$TARGET_BRANCH" == "master" ]; then
+        git config --global user.name "$GITLAB_USER_NAME"
+        git config --global user.email GITLAB_USER_EMAIL
+        git config --global push.default simple
+        git checkout $CI_COMMIT_REF_NAME
+        git tag -f build-$CI_COMMIT_REF_NAME
+        git push -f --tags http://gitlab-ci:_Ts7VRzvsKRbhguJjByv@git.intra.cape-it.de/$CI_PROJECT_PATH
+      fi  
+
+buildnumber:
   tags:
   - Shell
-  stage: buildinfo
+  stage: buildnumber
   when: on_success
   only:
   - /^rel-.+_FEATURE$/
@@ -32,7 +54,27 @@ trigger:buildinfo:backend:
   - git tag build-$BUILDNUMBER
   - git push http://gitlab-ci:_Ts7VRzvsKRbhguJjByv@git.intra.cape-it.de/$CI_PROJECT_PATH
 
-trigger:docker:backend:
+build:
+  tags:
+    - Shell
+  stage: build
+  only:
+    - tags
+    - /^build-.+$/ 
+  except:
+    - schedules
+    - triggers 
+  script:   
+    - tar cvfz kix-backend.tar.gz * --exclude=kix-backend.tar.gz
+    - md5sum -b kix-backend.tar.gz
+    - curl -u gitlab-ci:Ait4ugh2 -T kix-backend.tar.gz "http://artifactory.kix18.docker.vm.devel.cape-it.de/artifactory/kix18/backend/$CI_COMMIT_TAG/kix-backend.tar.gz?gitlab-project=$CI_PROJECT_URL;gitlab-job=$CI_PROJECT_URL/-/jobs/$CI_JOB_ID"  
+  artifacts:
+    paths:
+      - kix-backend.tar.gz
+    expire_in: 1 week
+  allow_failure: false
+
+docker:
   tags:
   - Curl
   stage: docker
@@ -43,4 +85,4 @@ trigger:docker:backend:
   - tags
   - triggers
   script:
-  - curl -x http://proxy.intra.cape-it.de:3128 http://docker.vm.devel.cape-it.de/cgi-bin/update_image_kix18-backend
+  - curl -x http://proxy.intra.cape-it.de:3128 http://docker.vm.devel.cape-it.de/cgi-bin/update_kix18_dev
