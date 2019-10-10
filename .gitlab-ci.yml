@@ -30,6 +30,7 @@ increase build number:
     - git add RELEASE
     - git commit -a -m "[skip ci] increased build number"
     - git tag build-$BUILDNUMBER
+    - git pull
     - git push http://gitlab-ci:_Ts7VRzvsKRbhguJjByv@git.intra.cape-it.de/$CI_PROJECT_PATH
 
 extract translatables:
