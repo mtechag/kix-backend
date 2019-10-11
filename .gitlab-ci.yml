@@ -33,25 +33,6 @@ increase build number:
     - git pull
     - git push http://gitlab-ci:_Ts7VRzvsKRbhguJjByv@git.intra.cape-it.de/$CI_PROJECT_PATH
 
-extract translatables:
-  tags:
-    - Shell
-  stage: update
-  only:
-    - /^rel-.+_FEATURE$/
-  except:
-    - tags
-    - triggers
-  script:
-    - git config --global user.name "$GITLAB_USER_NAME"
-    - git config --global user.email GITLAB_USER_EMAIL
-    - git config --global push.default simple
-    - git checkout $CI_COMMIT_REF_NAME
-    - bin/kix.Console.pl Dev::Tools::ExtractTranslatables2Pot
-    - git commit -a -m "[skip ci] extracted translatables" || echo "no changes"
-    - git pull
-    - git push http://gitlab-ci:_Ts7VRzvsKRbhguJjByv@git.intra.cape-it.de/$CI_PROJECT_PATH
-
 build backend:
   tags:
     - Shell
