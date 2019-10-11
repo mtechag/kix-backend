@@ -37,10 +37,8 @@ build backend:
   tags:
     - Shell
   stage: build
-  only:
-    - tags
-    - /^build-.+$/ 
   except:
+    - tags
     - schedules
     - triggers 
   script:   
