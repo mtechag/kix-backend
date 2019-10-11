@@ -50,7 +50,7 @@ build backend:
     - git checkout $CI_COMMIT_REF_NAME
     - git tag -f build-$CI_COMMIT_REF_NAME
     - git push -f --tags http://gitlab-ci:_Ts7VRzvsKRbhguJjByv@git.intra.cape-it.de/$CI_PROJECT_PATH
-    - curl -u gitlab-ci:Ait4ugh2 -T kix-backend.tar.gz "http://artifactory.kix18.docker.vm.devel.cape-it.de/artifactory/kix18/backend/$CI_COMMIT_TAG/kix-backend.tar.gz?gitlab-project=$CI_PROJECT_URL;gitlab-job=$CI_PROJECT_URL/-/jobs/$CI_JOB_ID"  
+    - curl -u gitlab-ci:Ait4ugh2 -T kix-backend.tar.gz "http://artifactory.kix18.docker.vm.devel.cape-it.de/artifactory/kix18/backend/build-$CI_COMMIT_REF_NAME/kix-backend.tar.gz?gitlab-project=$CI_PROJECT_URL;gitlab-job=$CI_PROJECT_URL/-/jobs/$CI_JOB_ID"  
   artifacts:
     paths:
       - kix-backend.tar.gz
