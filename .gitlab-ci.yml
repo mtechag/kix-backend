@@ -72,4 +72,4 @@ update docker image:
     - tags
     - triggers
   script:
-    - curl -x http://proxy.intra.cape-it.de:3128 http://docker.vm.devel.cape-it.de/cgi-bin/update_kix18_dev
+    - curl -x http://proxy.intra.cape-it.de:3128 http://docker.vm.devel.cape-it.de/cgi-bin/update_kix18_test-simple
