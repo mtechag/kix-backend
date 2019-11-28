@@ -4,6 +4,7 @@ variables:
 stages:
 - update
 - build
+- update docker image
 
 increase build number:
   tags:
