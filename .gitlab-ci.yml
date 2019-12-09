@@ -2,87 +2,75 @@ variables:
   GIT_STRATEGY: clone
   
 stages:
-- triggerbuild
-- buildnumber
+- update
 - build
-- docker
+- update docker image
 
-triggerbuild:
+increase build number:
   tags:
     - Shell
-  stage: triggerbuild
+  stage: update
   when: on_success
+  only:
+    - /^rel-.+_FEATURE$/
   except:
     - tags
     - triggers
   script:
-    - TARGET_BRANCH=$(echo $CI_COMMIT_REF_NAME | cut -d_ -f1)
-    - |
-      if [ "$TARGET_BRANCH" == "rel-18" ] || [ "$TARGET_BRANCH" == "master" ]; then
-        git config --global user.name "$GITLAB_USER_NAME"
-        git config --global user.email GITLAB_USER_EMAIL
-        git config --global push.default simple
-        git checkout $CI_COMMIT_REF_NAME
-        git tag -f build-$CI_COMMIT_REF_NAME
-        git push -f --tags http://gitlab-ci:_Ts7VRzvsKRbhguJjByv@git.intra.cape-it.de/$CI_PROJECT_PATH
-      fi  
+    - git config --global user.name "$GITLAB_USER_NAME"
+    - git config --global user.email GITLAB_USER_EMAIL
+    - git config --global push.default simple
+    - git checkout $CI_COMMIT_REF_NAME
+    - BUILDNUMBER=$(cat RELEASE | grep BUILDNUMBER | cut -d' ' -f3 | cut -d'-' -f1)
+    - BUILDNUMBER=$((BUILDNUMBER+1))
+    - BUILDDATE=$(date --rfc-2822)
+    - BUILDHOST=$(hostname -f)
+    - sed -i -e "s/^BUILDNUMBER = .*$/BUILDNUMBER = $BUILDNUMBER/g" RELEASE
+    - sed -i -e "s/^BUILDDATE = .*$/BUILDDATE = $BUILDDATE/g" RELEASE
+    - sed -i -e "s/^BUILDHOST = .*$/BUILDHOST = $BUILDHOST/g" RELEASE
+    - git add RELEASE
+    - git commit -a -m "[skip ci] increased build number"
+    - git tag build-$BUILDNUMBER
+    - git pull
+    - git push http://gitlab-ci:_Ts7VRzvsKRbhguJjByv@git.intra.cape-it.de/$CI_PROJECT_PATH
 
-buildnumber:
-  tags:
-  - Shell
-  stage: buildnumber
-  when: on_success
-  only:
-  - /^rel-.+_FEATURE$/
-  except:
-  - tags
-  - triggers
-  script:
-  - git config --global user.name "$GITLAB_USER_NAME"
-  - git config --global user.email GITLAB_USER_EMAIL
-  - git config --global push.default simple
-  - git checkout $CI_COMMIT_REF_NAME
-  - BUILDNUMBER=$(cat RELEASE | grep BUILDNUMBER | cut -d' ' -f3 | cut -d'-' -f1)
-  - BUILDNUMBER=$((BUILDNUMBER+1))
-  - BUILDDATE=$(date --rfc-2822)
-  - BUILDHOST=$(hostname -f)
-  - sed -i -e "s/^BUILDNUMBER = .*$/BUILDNUMBER = $BUILDNUMBER/g" RELEASE
-  - sed -i -e "s/^BUILDDATE = .*$/BUILDDATE = $BUILDDATE/g" RELEASE
-  - sed -i -e "s/^BUILDHOST = .*$/BUILDHOST = $BUILDHOST/g" RELEASE
-  - git add RELEASE
-  - git commit -a -m "[skip ci] increased build number"
-  - git tag build-$BUILDNUMBER
-  - git push http://gitlab-ci:_Ts7VRzvsKRbhguJjByv@git.intra.cape-it.de/$CI_PROJECT_PATH
-
-build:
+build backend:
   tags:
     - Shell
   stage: build
-  only:
-    - tags
-    - /^build-.+$/ 
   except:
+    - tags
     - schedules
     - triggers 
   script:   
     - tar cvfz kix-backend.tar.gz * --exclude=kix-backend.tar.gz
     - md5sum -b kix-backend.tar.gz
-    - curl -u gitlab-ci:Ait4ugh2 -T kix-backend.tar.gz "http://artifactory.kix18.docker.vm.devel.cape-it.de/artifactory/kix18/backend/$CI_COMMIT_TAG/kix-backend.tar.gz?gitlab-project=$CI_PROJECT_URL;gitlab-job=$CI_PROJECT_URL/-/jobs/$CI_JOB_ID"  
+    - git config --global user.name "$GITLAB_USER_NAME"
+    - git config --global user.email GITLAB_USER_EMAIL
+    - git config --global push.default simple
+    - git checkout $CI_COMMIT_REF_NAME
+    - git tag -f build-$CI_COMMIT_REF_NAME
+    - git push -f --tags http://gitlab-ci:_Ts7VRzvsKRbhguJjByv@git.intra.cape-it.de/$CI_PROJECT_PATH
+    - curl -u gitlab-ci:Ait4ugh2 -T kix-backend.tar.gz "http://artifactory.kix18.docker.vm.devel.cape-it.de/artifactory/kix18/backend/build-$CI_COMMIT_REF_NAME/kix-backend.tar.gz?gitlab-project=$CI_PROJECT_URL;gitlab-job=$CI_PROJECT_URL/-/jobs/$CI_JOB_ID"  
   artifacts:
     paths:
       - kix-backend.tar.gz
     expire_in: 1 week
   allow_failure: false
 
-docker:
+update docker image:
+  environment:
+    name: $CI_COMMIT_REF_NAME
+    url: https://docker.vm.devel.cape-it.de:3001/
   tags:
-  - Curl
-  stage: docker
+    - Curl
+  stage: build
   when: on_success
   only:
-  - /^rel-.+_FEATURE$/
+    - /^rel-.+_FEATURE$/
   except:
-  - tags
-  - triggers
+    - schedules
+    - tags
+    - triggers
   script:
-  - curl -x http://proxy.intra.cape-it.de:3128 http://docker.vm.devel.cape-it.de/cgi-bin/update_kix18_dev
+    - curl -x http://proxy.intra.cape-it.de:3128 http://docker.vm.devel.cape-it.de/cgi-bin/update_kix18_test-simple
