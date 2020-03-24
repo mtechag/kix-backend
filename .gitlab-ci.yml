@@ -74,3 +74,21 @@ update docker image:
     - triggers
   script:
     - curl -x http://proxy.intra.cape-it.de:3128 http://docker.vm.devel.cape-it.de/cgi-bin/update_kix18_test-simple
+
+github sync:
+  only:
+    - rel-18
+  except:
+    - schedules
+    - tags
+    - triggers
+  stage: build
+  allow_failure: false
+  script:
+    - git checkout origin/rel-18
+    - git filter-branch --force --index-filter "git rm --cached --ignore-unmatch .gitlab-ci.yml" --prune-empty --tag-name-filter cat -- --all
+
+    - git remote add github https://capeit-githubrobot:KIXstart4A11@github.com/cape-it/kix-backend.git
+    - git pull github
+    - git push github rel-18:master
+    - git remote remove github
