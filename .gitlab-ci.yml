@@ -4,6 +4,7 @@ variables:
 stages:
 - update
 - build
+- sync
 - update docker image
 
 increase build number:
@@ -82,8 +83,8 @@ github sync:
     - schedules
     - tags
     - triggers
-  stage: build
-  allow_failure: false
+  stage: sync
+  allow_failure: true
   script:
     - git checkout origin/rel-18
     - git filter-branch --force --index-filter "git rm --cached --ignore-unmatch .gitlab-ci.yml" --prune-empty --tag-name-filter cat -- --all
