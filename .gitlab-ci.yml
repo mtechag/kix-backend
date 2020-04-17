@@ -89,9 +89,5 @@ github sync:
     - git checkout origin/rel-18
     - git filter-branch --force --index-filter "git rm --cached --ignore-unmatch .gitlab-ci.yml" --prune-empty --tag-name-filter cat -- --all
     - git remote add github https://capeit-githubrobot:KIXstart4A11@github.com/cape-it/kix-backend.git
-    - git fetch github
-    - git checkout github/master
-    - git config merge.renameLimit 999999
-    - git merge -s recursive -X theirs origin/rel-18
-    - git config --unset merge.renameLimit
+    - git push --force github/master
     - git remote remove github
