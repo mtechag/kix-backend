@@ -91,6 +91,6 @@ github sync:
     - git remote add github https://capeit-githubrobot:KIXstart4A11@github.com/cape-it/kix-backend.git
     - git fetch github
     - git checkout github/master
-    - git merge origin/rel-18
-    - git push github rel-18:master
+    - git merge --strategy=theirs origin/rel-18
+    - #git push github rel-18:master
     - git remote remove github
