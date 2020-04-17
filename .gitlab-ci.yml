@@ -92,5 +92,4 @@ github sync:
     - git fetch github
     - git checkout github/master
     - git merge --strategy=theirs origin/rel-18
-    - #git push github rel-18:master
     - git remote remove github
