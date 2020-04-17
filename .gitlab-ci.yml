@@ -88,6 +88,6 @@ github sync:
   script:
     - git checkout origin/rel-18
     - git filter-branch --force --index-filter "git rm --cached --ignore-unmatch .gitlab-ci.yml" --prune-empty --tag-name-filter cat -- --all
-    - git remote add github https://capeit-githubrobot:KIXstart4A11@github.com/cape-it/kix-backend.git
+    - git remote add github https://capeit-githubrobot:(KIX5tart4A11)!@github.com/cape-it/kix-backend.git
     - git push --force github HEAD:master
     - git remote remove github
