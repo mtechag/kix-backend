@@ -12,6 +12,7 @@ increase build number:
     - Shell
   stage: update
   when: on_success
+  allow_failure: false
   only:
     - /^rel-.+_FEATURE$/
   except:
@@ -53,11 +54,7 @@ build backend:
     - git tag -f build-$CI_COMMIT_REF_NAME
     - git push -f --tags http://gitlab-ci:_Ts7VRzvsKRbhguJjByv@git.intra.cape-it.de/$CI_PROJECT_PATH
     - curl -u gitlab-ci:Ait4ugh2 -T kix-backend.tar.gz "http://artifactory.kix18.docker.vm.devel.cape-it.de/artifactory/kix18/backend/build-$CI_COMMIT_REF_NAME/kix-backend.tar.gz?gitlab-project=$CI_PROJECT_URL;gitlab-job=$CI_PROJECT_URL/-/jobs/$CI_JOB_ID"  
-  artifacts:
-    paths:
-      - kix-backend.tar.gz
-    expire_in: 1 week
-  allow_failure: false
+    - rm -f kix-backend.tar.gz
 
 update docker image:
   environment:
