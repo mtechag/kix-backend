@@ -90,6 +90,7 @@ github sync:
     - git filter-branch --force --index-filter "git rm --cached --ignore-unmatch .gitlab-ci.yml" --prune-empty --tag-name-filter cat -- --all
 
     - git remote add github https://capeit-githubrobot:KIXstart4A11@github.com/cape-it/kix-backend.git
+    - git checkout rel-18:master
     - git pull github
     - git push github rel-18:master
     - git remote remove github
